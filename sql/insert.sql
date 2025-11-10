@@ -1,6 +1,15 @@
 INSERT INTO creator (first_name, last_name, email_address, phone_number)
 VALUES ('Sticker', 'Shop', 'thestickershop@stickershop.com', '123-456-7890');
 
+INSERT INTO creator (first_name, middle_name, last_name, email_address, phone_number, payout_method) 
+VALUES ('Benillas', 'H', 'Nguyen','bennguyen123456@sticker.com', '123-456-7890', 'mastercard');
+
+
+INSERT INTO customer (first_name, middle_name, last_name, email_address, phone_number, street, city, postal_code) 
+VALUES ('John', 'Doe', 'johndoe101@gmail.com', '987-654-3210', '123 sticker St', 'Stickerfield', '12345');
+
+
+
 INSERT INTO sticker (creator_id, name, description, date_created)
 VALUES (1, 'Square Sticker', 'A sticker that is a shape of a square.', current_date); -- use current_date https://www.postgresql.org/docs/8.2/functions-datetime.html
 INSERT INTO polygonal_sticker
@@ -15,6 +24,11 @@ INSERT INTO sticker (creator_id, name, description, date_created)
 VALUES (1, 'Triangle Sticker', 'A sticker that is a shape of a triangle.', current_date);
 INSERT INTO polygonal_sticker
 VALUES (3, 'triangle');
+
+INSERT INTO sticker (creator_id, name, description, date_created)
+VALUES (2, 'Among Us Sticker', 'A red sussy imposter sticker that keeps you alert.', current_date);
+INSERT INTO polygonal_sticker
+VALUES (4, 'heart');
 
 -- materials based on what RedBubble has
 -- https://www.redbubble.com/i/sticker/Hang-on-Let-me-overthink-this-by-chestify/29205665.EJUG5

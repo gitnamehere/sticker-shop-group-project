@@ -44,7 +44,7 @@ CREATE TABLE sticker (
 );
 
 CREATE TABLE sticker_sizes (
-    size_id          SERIAL,
+    size_id     SERIAL,
     length      DECIMAL (5, 2) NOT NULL, -- stored in centimeters
     width       DECIMAL (5, 2) NOT NULL,
     sticker_id  INTEGER,
@@ -100,7 +100,6 @@ CREATE TABLE orders (
     PRIMARY KEY (order_id),
     FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
 );
-
 
 CREATE TABLE order_items (
     id                  SERIAL,

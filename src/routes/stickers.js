@@ -33,16 +33,29 @@ stickersRouter.get("/polygonal", async (req, res) => {
 });
 
 stickersRouter.post("/create", async (req, res) => {
+  const client = await pool.connect();
+ 
   const { creator_id, name, description, image_data } = req.body;
+  const date_created = new CurrentDate();
 
   if (!creator_id || !name || !description || !image_data) {
     return res.status(400).send("All fields are required");
   }
 
-  const date_created = CurrentDate();
-
-  const result = await pool.query( "INSERT INTO sticker (creator_id, name, description, date_created) VALUES ($1, $2, $3, $4)", [creator_id, name, description, date_created] );
-  await pool.query("INSERT INTO image_sticker (sticker_id, image_data) VALUES ($1, $2);", [result.rows[0].sticker_id, image_data]);
+  try {
+    await client.query("BEGIN");
+    const insertStickerText = "INSERT INTO sticker (creator_id, name, description, date_created) VALUES ($1, $2, $3, $4)";
+    const stickerRes = await client.query(insertStickerText, [ creator_id, name, description, date_created ]);
+    const sticker = stickerRes.rows[0];
+    await client.query( "INSERT INTO image_sticker (sticker_id, image_data) VALUES ($1, $2)", [sticker.sticker_id, image_data]);
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.log(error);
+    res.status(500).send("Error creating sticker");
+  } finally {
+    client.release();
+  }
 });
 
 export { stickersRouter };

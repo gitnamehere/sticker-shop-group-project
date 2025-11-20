@@ -1,33 +1,32 @@
 import express from "express";
-import { pool } from "../db.js";
+import * as db from "../db.js";
 
 const stickersRouter = express.Router();
 
 stickersRouter.get("/all", async (req, res) => {
-  const result = await pool.query("SELECT * FROM sticker");
+  const result = await db.query("SELECT * FROM sticker");
   res.send(result.rows);
 });
 
 stickersRouter.get("/creator/:creator_id", async (req, res) => {
   const { creator_id } = req.params;
 
-  const result = await pool.query("SELECT * FROM sticker WHERE creator_id = $1", [creator_id]);
+  const result = await db.query("SELECT * FROM sticker WHERE creator_id = $1", [creator_id]);
   res.send(result.rows);
 });
 
 stickersRouter.get("/image_sticker", async (req, res) => {
-  const result = await pool.query("SELECT * FROM sticker, image_sticker WHERE sticker.sticker_id = image_sticker.sticker_id");
+  const result = await db.query("SELECT * FROM sticker, image_sticker WHERE sticker.sticker_id = image_sticker.sticker_id");
   res.send(result.rows);
 });
 
 stickersRouter.get("/polygonal", async (req, res) => {
-  const result = await pool.query("SELECT * FROM sticker, polygonal_sticker WHERE sticker.sticker_id = polygonal_sticker.sticker_id");
+  const result = await db.query("SELECT * FROM sticker, polygonal_sticker WHERE sticker.sticker_id = polygonal_sticker.sticker_id");
   res.send(result.rows);
 });
 
 stickersRouter.post("/create", async (req, res) => {
-  const client = await pool.connect();
- 
+  const client = await db.getClient();
   const { creator_id, name, description, image_data } = req.body;
   const date_created = new Date();
 
@@ -57,13 +56,13 @@ stickersRouter.post("/create", async (req, res) => {
 stickersRouter.get("/:id", async (req, res) => {
   const { id } = req.params;
 
-  const result = await pool.query("SELECT * FROM sticker WHERE sticker_id = $1", [id]);
+  const result = await db.query("SELECT * FROM sticker WHERE sticker_id = $1", [id]);
   if (!result.rows.length) return res.sendStatus(404);
 
   // check if it's an image sticker
   // TODO: add base64 encoding/decoding (when we eventually get around to doing that)
   // https://www.postgresql.org/docs/current/functions-binarystring.html
-  const imageResult = await pool.query("SELECT image_data FROM image_sticker WHERE sticker_id = $1", [id]);
+  const imageResult = await db.query("SELECT image_data FROM image_sticker WHERE sticker_id = $1", [id]);
   if (imageResult.rows.length) {
     result.rows[0].sticker = {
       type: "image",
@@ -73,7 +72,7 @@ stickersRouter.get("/:id", async (req, res) => {
   }
 
   // check if it's a polygonal sticker
-  const polygonalResult = await pool.query("SELECT shape FROM polygonal_sticker WHERE sticker_id = $1", [id]);
+  const polygonalResult = await db.query("SELECT shape FROM polygonal_sticker WHERE sticker_id = $1", [id]);
   if (polygonalResult.rows.length) {
     result.rows[0].sticker = {
       type: "polygonal",

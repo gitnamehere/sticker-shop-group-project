@@ -73,7 +73,7 @@ stickersRouter.get("/:id", async (req, res) => {
   }
 
   // check if it's a polygonal sticker
-  const polygonalResult = await pool.query("SELECT * FROM polygonal_sticker WHERE sticker_id = $1", [id]);
+  const polygonalResult = await pool.query("SELECT shape FROM polygonal_sticker WHERE sticker_id = $1", [id]);
   if (polygonalResult.rows.length) {
     result.rows[0].sticker = {
       type: "polygonal",

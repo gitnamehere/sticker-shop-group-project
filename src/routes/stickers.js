@@ -37,8 +37,6 @@ stickersRouter.get("/all", async (req, res) => {
 stickersRouter.get("/browse", async (req, res) => {
   const result = await pool.query("SELECT sticker_id, name FROM sticker");
 
-  console.log(result.rows);
-
   for (let i = 0; i < result.rows.length; i++) {
     result.rows[i].sticker = await getStickerbyId(result.rows[i].sticker_id);
   }

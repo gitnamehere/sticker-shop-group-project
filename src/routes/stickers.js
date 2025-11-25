@@ -1,5 +1,8 @@
 import express from "express";
+import multer from "multer";
 import { pool } from "../db.js";
+
+const upload = multer();
 
 const stickersRouter = express.Router();
 
@@ -61,13 +64,18 @@ stickersRouter.get("/polygonal", async (req, res) => {
   res.send(result.rows);
 });
 
-stickersRouter.post("/create", async (req, res) => {
+// multer stuff https://github.com/expressjs/multer
+stickersRouter.post("/create", upload.single("imageData"), async (req, res) => {
   const client = await pool.connect();
+
+  console.log(req.body);
+  console.log(req.file);
  
-  const { creator_id, name, description, image_data } = req.body;
+  const { creator_id, name, description } = req.body;
+  const imageData = req.file.imageData;
   const date_created = new Date();
 
-  if (!creator_id || !name || !description || !image_data) {
+  if (!creator_id || !name || !description || !imageData) {
     return res.status(400).send("All fields are required");
   }
 
@@ -78,7 +86,7 @@ stickersRouter.post("/create", async (req, res) => {
     const insertStickerText = "INSERT INTO sticker (creator_id, name, description, date_created) VALUES ($1, $2, $3, $4) RETURNING sticker_id";
     const stickerRes = await client.query(insertStickerText, [ creator_id, name, description, date_created ]);
     const sticker = stickerRes.rows[0];
-    await client.query( "INSERT INTO image_sticker (sticker_id, image_data) VALUES ($1, $2)", [sticker.sticker_id, image_data]);
+    await client.query( "INSERT INTO image_sticker (sticker_id, image_data) VALUES ($1, $2)", [sticker.sticker_id, imageData]);
     await client.query("COMMIT");
     return res.sendStatus(200);
   } catch (error) {

@@ -13,18 +13,6 @@ export const query = async (text, params) => {
   return pool.query(text, params);
 }
 
-export const getClient = async () => {
-  const client = await pool.connect();
-  const initialRelease = client.release.bind(client);
-  let released = false;
-  client.release = () => {
-    if (!released) {
-      released = true;
-      return initialRelease();
-    }
-    return Promise.resolve();
-  }
-  return client;
-}
+export const getClient = async () => { return await pool.connect();}
 
 export { pool };

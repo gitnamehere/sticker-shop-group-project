@@ -20,7 +20,7 @@ services:
       build:
         context: .
         dockerfile: ./docker/app/Dockerfile
-      container_name: sticker
+      container_name: sticker_shop_app
       ports:
         - "3000:3000"
       environment:

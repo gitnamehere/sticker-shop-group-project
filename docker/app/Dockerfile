@@ -21,4 +21,4 @@ USER node
 EXPOSE 3000
 
 # Default command
-CMD ["npm", "start"]
+CMD ["npm", "run", "start-docker"]

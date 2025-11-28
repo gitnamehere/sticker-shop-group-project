@@ -1,7 +1,7 @@
 INSERT INTO account (first_name, last_name, email_address, password_hash, phone_number, is_creator)
 VALUES ('Sticker', 'Shop', 'thestickershop@stickershop.com', 'password', '123-456-7890', TRUE);
 
-INSERT INTO account (first_name, middle_name, last_name, email_address, password_hash, phone_number is_creator) 
+INSERT INTO account (first_name, middle_name, last_name, email_address, password_hash, phone_number, is_creator) 
 VALUES ('Benillas', 'H', 'Nguyen','bennguyen123456@sticker.com', 'benillas', '123-456-7891', TRUE);
 
 INSERT INTO account (first_name, last_name, email_address, password_hash, phone_number, street, city, postal_code) 

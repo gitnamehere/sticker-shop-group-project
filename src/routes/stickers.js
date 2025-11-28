@@ -47,7 +47,7 @@ stickersRouter.get("/browse", async (req, res) => {
   return res.send(result.rows);
 })
 
-stickersRouter.get("/account/:account_id", async (req, res) => {
+stickersRouter.get("/creator/:account_id", async (req, res) => {
   const { account_id } = req.params;
 
   const result = await db.query("SELECT * FROM sticker WHERE account_id = $1", [account_id]);

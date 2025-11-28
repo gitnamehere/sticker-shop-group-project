@@ -11,7 +11,7 @@ CREATE TABLE account (
     street          VARCHAR(100),
     city            VARCHAR(50),
     postal_code	    VARCHAR(20),
-    account_flg    BOOLEAN NOT NULL DEFAULT FALSE,
+    is_creator    BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (account_id)
 );
 

@@ -1,7 +1,12 @@
 // standard express starter code https://expressjs.com/en/starter/hello-world.html
-const express = require('express');
+import express from "express";
+import cors from "cors";
 const app = express();
 const port = 3000;
+import { stickersRouter } from "./routes/stickers.js";
+
+app.use(cors());
+app.use("/stickers", stickersRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')

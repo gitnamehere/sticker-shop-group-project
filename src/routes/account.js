@@ -63,7 +63,7 @@ accountRouter.put("/:id", async (req, res) => {
     }
 
     // single UPDATE using COALESCE to preserve existing values when undefined
-    // https://www.w3schools.com/sql/func_sqlserver_coalesce.asp
+    // https://www.postgresql.org/docs/current/functions-conditional.html#FUNCTIONS-COALESCE-NVL-IFNULL
     const updateText = `
       UPDATE account SET
         first_name = COALESCE($1, first_name),

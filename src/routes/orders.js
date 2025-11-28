@@ -1,7 +1,7 @@
 import express from "express";
 import * as db from "../db.js";
 
-export const ordersRouter = express.Router();
+const ordersRouter = express.Router();
 
 ordersRouter.get("/all", async (req, res) => {
   const result = await db.query("SELECT * FROM orders");
@@ -10,31 +10,43 @@ ordersRouter.get("/all", async (req, res) => {
 
 ordersRouter.post("/", async (req, res) => {
   const client = await db.getClient();
-  const { accountId, orderDate, status, items } = req.body;
+  const { accountId, orderId, items } = req.body;
 
   try {
     await client.query("BEGIN");
 
-    // https://www.w3schools.com/sql/func_sqlserver_coalesce.asp
+    // https://www.postgresql.org/docs/current/functions-conditional.html#FUNCTIONS-COALESCE-NVL-IFNULL
     const insertText = `
-      INSERT INTO orders (account_id, order_date, status)
-      VALUES ($1, COALESCE($2::timestamp, NOW()), $3)
+      INSERT INTO orders (account_id, order_Id)
+      VALUES ($1, $2)
       RETURNING *`;
-    const values = [accountId, orderDate, status];
+    const values = [accountId, orderId];
     const result = await client.query(insertText, values);
     const order = result.rows[0];
 
     if (items && Array.isArray(items) && items.length) {
       for (const item of items) {
-        const { stickerId, stickerMaterialId, quantity} = item;
-        if (!stickerId || !quantity) {
+        const { stickerId, materialId, colorId } = item;
+
+        if (!materialId || !colorId) {
           await client.query("ROLLBACK");
-          return res.status(400).json({ error: "Each item requires stickerId and quantity" });
+          return res.status(400).json({ error: "Each item requires materialId and colorId" });
+        }
+
+        const smSelect = `SELECT sticker_material_id FROM sticker_material WHERE sticker_id = $1 AND material_id = $2 AND color_id = $3`;
+        const smResult = await client.query(smSelect, [stickerId, materialId, colorId]);
+        let stickerMaterialId;
+        if (smResult.rows.length) {
+          stickerMaterialId = smResult.rows[0].sticker_material_id;
+        } else {
+          const smInsert = `INSERT INTO sticker_material (sticker_id, material_id, color_id) VALUES ($1, $2, $3) RETURNING sticker_material_id`;
+          const smInsertRes = await client.query(smInsert, [stickerId, materialId, colorId]);
+          stickerMaterialId = smInsertRes.rows[0].sticker_material_id;
         }
 
         await client.query(
-          `INSERT INTO order_items (order_id, sticker_id, sticker_material_id, quantity) VALUES ($1, $2, $3, $4)`,
-          [order.order_id, stickerId, stickerMaterialId, quantity]
+          `INSERT INTO order_items (order_id, sticker_id, sticker_material_id) VALUES ($1, $2, $3)`,
+          [order.order_id, stickerId, stickerMaterialId]
         );
       }
     }
@@ -66,10 +78,9 @@ ordersRouter.delete("/:id", async (req, res) => {
 });
 
 ordersRouter.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const result = await db.query("SELECT * FROM orders WHERE order_id = $1", [id]);
-  if (result.rowCount === 0) return res.sendStatus(404);
-  res.json(result.rows[0]);
+  const {order_id, account_id } = result.rows[0];
+  const orderItems = await db.query("SELECT * FROM order_items WHERE order_id = $1", [order_id]);
+  res.json({ order_id, account_id, items: orderItems.rows });
 });
 
 export { ordersRouter };

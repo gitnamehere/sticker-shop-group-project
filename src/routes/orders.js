@@ -14,7 +14,6 @@ ordersRouter.post("/", async (req, res) => {
 
   try {
     await client.query("BEGIN");
-
     // https://www.postgresql.org/docs/current/functions-conditional.html#FUNCTIONS-COALESCE-NVL-IFNULL
     const insertText = `
       INSERT INTO orders (account_id, order_Id)
@@ -26,11 +25,11 @@ ordersRouter.post("/", async (req, res) => {
 
     if (items && Array.isArray(items) && items.length) {
       for (const item of items) {
-        const { stickerId, materialId, colorId } = item;
+        const { stickerId, materialId, colorId, quantity } = item;
 
-        if (!materialId || !colorId) {
+        if (!stickerId || !materialId || !colorId || !quantity) {
           await client.query("ROLLBACK");
-          return res.status(400).json({ error: "Each item requires materialId and colorId" });
+          return res.status(400).json({ error: "Each item requires stickerId, materialId, colorId, and quantity" });
         }
 
         const smSelect = `SELECT sticker_material_id FROM sticker_material WHERE sticker_id = $1 AND material_id = $2 AND color_id = $3`;

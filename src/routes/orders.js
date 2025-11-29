@@ -4,8 +4,23 @@ import * as db from "../db.js";
 const ordersRouter = express.Router();
 
 ordersRouter.get("/all", async (req, res) => {
-  const result = await db.query("SELECT * FROM orders WHERE account_id = $1", [req.query.accountId]);
-  res.json(result.rows);
+  const accountIdRaw = req.query.accountId;
+  // checks to validate accountId and prevent SQL injection
+  if (!accountIdRaw) {
+    return res.status(400).json({ error: "Missing query parameter: accountId" });
+  }
+  const accountId = Number(accountIdRaw);
+  if (!Number.isInteger(accountId) || accountId <= 0) {
+    return res.status(400).json({ error: "Invalid accountId" });
+  }
+
+  try {
+    const result = await db.query("SELECT * FROM orders WHERE account_id = $1", [accountId]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    res.sendStatus(500);
+  }
 });
 
 ordersRouter.post("/", async (req, res) => {
@@ -78,13 +93,38 @@ ordersRouter.delete("/:id", async (req, res) => {
 
 ordersRouter.get("/:id", async (req, res) => {
   const { id } = req.params;
-  const result = await db.query("SELECT * FROM orders WHERE order_id = $1 AND account_id = $2", [id, req.query.accountId]);
-  if (result.rowCount === 0) {
-    return res.sendStatus(404);
+  const accountIdRaw = req.query.accountId;
+  if (!accountIdRaw) {
+    return res.status(400).json({ error: "Missing query parameter: accountId" });
   }
-  const {order_id, account_id } = result.rows[0];
-  const orderItems = await db.query("SELECT * FROM order_items WHERE order_id = $1", [order_id]);
-  res.json({ order_id, account_id, items: orderItems.rows });
+
+  const orderId = Number(id);
+  const accountId = Number(accountIdRaw);
+  if (!Number.isInteger(orderId) || orderId <= 0) {
+    return res.status(400).json({ error: "Invalid order id" });
+  }
+  if (!Number.isInteger(accountId) || accountId <= 0) {
+    return res.status(400).json({ error: "Invalid accountId" });
+  }
+
+  try {
+    const result = await db.query(
+      "SELECT * FROM orders WHERE order_id = $1 AND account_id = $2",
+      [orderId, accountId]
+    );
+    if (result.rowCount === 0) {
+      return res.sendStatus(404);
+    }
+    const { order_id, account_id } = result.rows[0];
+    const orderItems = await db.query(
+      "SELECT * FROM order_items WHERE order_id = $1",
+      [order_id]
+    );
+    res.json({ order_id, account_id, items: orderItems.rows });
+  } catch (err) {
+    console.error("Error fetching order:", err);
+    res.sendStatus(500);
+  }
 });
 
 export { ordersRouter };

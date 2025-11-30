@@ -2,16 +2,16 @@ CREATE DATABASE sticker_shop_db;
 
 CREATE TABLE account (
     account_id     SERIAL,
-    first_name      VARCHAR(100) NOT NULL,
-    middle_name     VARCHAR(100),
-    last_name       VARCHAR(100) NOT NULL,
-    email_address   VARCHAR(256) NOT NULL UNIQUE,
-    password_hash   VARCHAR(256) NOT NULL,
-    phone_number    VARCHAR(20) NOT NULL UNIQUE,
-    street          VARCHAR(100),
-    city            VARCHAR(50),
-    postal_code	    VARCHAR(20),
-    is_creator    BOOLEAN NOT NULL DEFAULT FALSE,
+    first_name     VARCHAR(100) NOT NULL,
+    middle_name    VARCHAR(100),
+    last_name      VARCHAR(100) NOT NULL,
+    email_address  VARCHAR(256) NOT NULL UNIQUE,
+    password_hash  VARCHAR(256) NOT NULL,
+    phone_number   VARCHAR(20) NOT NULL UNIQUE,
+    street         VARCHAR(100),
+    city           VARCHAR(50),
+    postal_code	   VARCHAR(20),
+    is_creator     BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (account_id)
 );
 
@@ -86,7 +86,7 @@ CREATE TABLE sticker_material (
 
 CREATE TABLE orders (
     order_id	SERIAL,
-    account_id INTEGER,
+    account_id  INTEGER,
     PRIMARY KEY (order_id),
     FOREIGN KEY (account_id) REFERENCES account (account_id)
 );

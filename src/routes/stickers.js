@@ -9,6 +9,8 @@ const stickersRouter = express.Router();
 const getStickerbyId = async (id) => {
   const materials = await db.query("SELECT * FROM materials");
   const colors = await db.query("SELECT * FROM colors");
+  const sizes = await db.query("SELECT * FROM sticker_sizes WHERE sticker_id = $1", [id]);
+
   // check if it's an image sticker
   // use the postgres encode function to encode the image in base64
   // https://www.postgresql.org/docs/current/functions-binarystring.html
@@ -18,7 +20,8 @@ const getStickerbyId = async (id) => {
       type: "image",
       image_data: imageResult.rows[0].encode,
       materials: materials.rows,
-      colors: colors.rows
+      colors: colors.rows,
+      sizes: sizes.rows
     }
   }
 
@@ -29,7 +32,8 @@ const getStickerbyId = async (id) => {
       type: "polygonal",
       shape: polygonalResult.rows[0].shape,
       materials: materials.rows,
-      colors: colors.rows
+      colors: colors.rows,
+      sizes: sizes.rows
     }
   }
 

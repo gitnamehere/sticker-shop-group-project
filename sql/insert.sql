@@ -107,13 +107,39 @@ VALUES (18, decode('iVBORw0KGgoAAAANSUhEUgAAAV4AAAFeCAMAAAD69YcoAAADAFBMVEVHcEy/
 INSERT INTO sticker_sizes (length, width, sticker_id)
 VALUES(10, 10, 1);
 INSERT INTO sticker_sizes (length, width, sticker_id)
-VALUES(5, 5, 2);
+VALUES(10, 10, 2);
 INSERT INTO sticker_sizes (length, width, sticker_id)
-VALUES(15, 15, 3);
+VALUES(10, 10, 3);
 INSERT INTO sticker_sizes (length, width, sticker_id)
-VALUES(4, 2, 4);
+VALUES(10, 10, 4);
 INSERT INTO sticker_sizes (length, width, sticker_id)
 VALUES(10, 10, 5);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 6);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 7);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 8);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 9);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 10);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 11);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 12);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 13);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 14);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 15);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 16);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 17);
+INSERT INTO sticker_sizes (length, width, sticker_id)
+VALUES(10, 10, 18);
 
 -- materials based on what RedBubble has
 -- https://www.redbubble.com/i/sticker/Hang-on-Let-me-overthink-this-by-chestify/29205665.EJUG5
@@ -146,21 +172,21 @@ VALUES (1);
 -- glossy red square sticker
 INSERT INTO sticker_material (sticker_id, material_id, color_id)
 VALUES (1, 1, 1);
-INSERT INTO order_items (order_id, sticker_id, sticker_material_id)
-VALUES (1, 1, 1);
+INSERT INTO order_items (order_id, sticker_id, sticker_material_id, sticker_size_id)
+VALUES (1, 1, 1, 1);
 -- glossy red circle sticker
 INSERT INTO sticker_material (sticker_id, material_id, color_id)
 VALUES (2, 1, 1);
-INSERT INTO order_items (order_id, sticker_id, sticker_material_id)
-VALUES (1, 2, 2);
+INSERT INTO order_items (order_id, sticker_id, sticker_material_id, sticker_size_id)
+VALUES (1, 2, 2, 2);
 
 INSERT INTO orders (account_id)
 VALUES (2);
 -- amongus
 INSERT INTO sticker_material (sticker_id, material_id, color_id)
 VALUES (11, 1, 1);
-INSERT INTO order_items (order_id, sticker_id, sticker_material_id)
-VALUES (2, 11, 3);
+INSERT INTO order_items (order_id, sticker_id, sticker_material_id, sticker_size_id)
+VALUES (2, 11, 3, 3);
 
 INSERT INTO payment_method (account_id, method)
 VALUES (1, 'test');

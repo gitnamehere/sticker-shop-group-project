@@ -12,7 +12,25 @@ ordersRouter.get("/:accountId/all", async (req, res) => {
       return res.sendStatus(404);
     }
     for (const order of result.rows) {
-      const itemsResult = await db.query("SELECT * FROM order_items WHERE order_id = $1", [order.order_id]);
+      const itemsQuery = `
+        SELECT
+          oi.id,
+          oi.order_id,
+          oi.sticker_id,
+          oi.sticker_material_id,
+          oi.sticker_size_id,
+          m.material AS material,
+          c.color AS color,
+          ss.length,
+          ss.width
+        FROM order_items oi
+        LEFT JOIN sticker_material sm ON oi.sticker_material_id = sm.sticker_material_id
+        LEFT JOIN materials m ON sm.material_id = m.material_id
+        LEFT JOIN colors c ON sm.color_id = c.color_id
+        LEFT JOIN sticker_sizes ss ON oi.sticker_size_id = ss.size_id
+        WHERE oi.order_id = $1
+      `;
+      const itemsResult = await db.query(itemsQuery, [order.order_id]);
       order.items = itemsResult.rows;
     }
     res.json(result.rows);
@@ -28,7 +46,7 @@ ordersRouter.post("/", async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    // https://www.postgresql.org/docs/current/functions-conditional.html#FUNCTIONS-COALESCE-NVL-IFNULL
+
     const insertText = `
       INSERT INTO orders (account_id)
       VALUES ($1)
@@ -102,10 +120,25 @@ ordersRouter.get("/:accountId/:orderId", async (req, res) => {
       return res.sendStatus(404);
     }
     const { order_id, account_id } = result.rows[0];
-    const orderItems = await db.query(
-      "SELECT * FROM order_items WHERE order_id = $1",
-      [order_id]
-    );
+    const itemsQuery = `
+      SELECT
+        oi.id,
+        oi.order_id,
+        oi.sticker_id,
+        oi.sticker_material_id,
+        oi.sticker_size_id,
+        m.material AS material,
+        c.color AS color,
+        ss.length,
+        ss.width
+      FROM order_items oi
+      LEFT JOIN sticker_material sm ON oi.sticker_material_id = sm.sticker_material_id
+      LEFT JOIN materials m ON sm.material_id = m.material_id
+      LEFT JOIN colors c ON sm.color_id = c.color_id
+      LEFT JOIN sticker_sizes ss ON oi.sticker_size_id = ss.size_id
+      WHERE oi.order_id = $1
+    `;
+    const orderItems = await db.query(itemsQuery, [order_id]);
     res.json({ order_id, account_id, items: orderItems.rows });
   } catch (err) {
     console.error("Error fetching order:", err);

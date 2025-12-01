@@ -1,5 +1,6 @@
 import express from "express";
 import * as db from "../db.js";
+import { getStickerbyId } from "./stickers.js";
 
 const ordersRouter = express.Router();
 
@@ -31,6 +32,15 @@ ordersRouter.get("/:accountId/all", async (req, res) => {
         WHERE oi.order_id = $1
       `;
       const itemsResult = await db.query(itemsQuery, [order.order_id]);
+      for (const item of itemsResult.rows) {
+        try {
+          const stickerData = await getStickerbyId(item.sticker_id);
+          item.sticker = stickerData;
+        } catch (err) {
+          console.error("Error fetching sticker data for sticker_id", item.sticker_id, err);
+          item.sticker = {};
+        }
+      }
       order.items = itemsResult.rows;
     }
     res.json(result.rows);
@@ -139,6 +149,15 @@ ordersRouter.get("/:accountId/:orderId", async (req, res) => {
       WHERE oi.order_id = $1
     `;
     const orderItems = await db.query(itemsQuery, [order_id]);
+    for (const item of orderItems.rows) {
+      try {
+        const stickerData = await getStickerbyId(item.sticker_id);
+        item.sticker = stickerData;
+      } catch (err) {
+        console.error("Error fetching sticker data for sticker_id", item.sticker_id, err);
+        item.sticker = {};
+      }
+    }
     res.json({ order_id, account_id, items: orderItems.rows });
   } catch (err) {
     console.error("Error fetching order:", err);

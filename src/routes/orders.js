@@ -3,8 +3,8 @@ import * as db from "../db.js";
 
 const ordersRouter = express.Router();
 
-ordersRouter.get("/all/:accountId", async (req, res) => {
-  const accountId = req.params.accountId;
+ordersRouter.get("/:accountId/all", async (req, res) => {
+  const { accountId } = req.params;
 
   try {
     const result = await db.query("SELECT * FROM orders WHERE account_id = $1", [accountId]);
@@ -83,7 +83,7 @@ ordersRouter.delete("/:id", async (req, res) => {
   }
 });
 
-ordersRouter.get("/:orderId/:accountId", async (req, res) => {
+ordersRouter.get("/:accountId/:orderId", async (req, res) => {
   const { orderId, accountId } = req.params;
 
   try {

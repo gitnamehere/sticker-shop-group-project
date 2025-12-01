@@ -8,9 +8,16 @@ ordersRouter.get("/:accountId/all", async (req, res) => {
 
   try {
     const result = await db.query("SELECT * FROM orders WHERE account_id = $1", [accountId]);
+    if(result.rowCount === 0) {
+      return res.sendStatus(404);
+    }
+    for (const order of result.rows) {
+      const itemsResult = await db.query("SELECT * FROM order_items WHERE order_id = $1", [order.order_id]);
+      order.items = itemsResult.rows;
+    }
     res.json(result.rows);
   } catch (err) {
-    console.error("Error fetching orders:", err);
+    console.error("Error fetching order:", err);
     res.sendStatus(500);
   }
 });

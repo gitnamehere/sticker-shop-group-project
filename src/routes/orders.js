@@ -117,7 +117,7 @@ ordersRouter.delete("/:id", async (req, res) => {
       }
       await client.query("COMMIT");
       res.sendStatus(204);
-    } catch (err) {
+    } catch {
         await client.query("ROLLBACK");
         throw err;
     } finally {

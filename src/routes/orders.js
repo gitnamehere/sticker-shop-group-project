@@ -105,17 +105,24 @@ ordersRouter.post("/", async (req, res) => {
 
 ordersRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  try {
-    const deleteText = "DELETE FROM orders WHERE order_id = $1";
-    const result = await db.query(deleteText, [id]);
-    if (result.rowCount === 0) {
-      return res.sendStatus(404);
+    const client = await db.getClient();
+    try {
+      await client.query("BEGIN");
+      await client.query("DELETE FROM order_items WHERE order_id = $1", [id]);
+      const deleteText = "DELETE FROM orders WHERE order_id = $1";
+      const result = await client.query(deleteText, [id]);
+      if (result.rowCount === 0) {
+        await client.query("ROLLBACK");
+        return res.sendStatus(404);
+      }
+      await client.query("COMMIT");
+      res.sendStatus(204);
+    } catch {
+        await client.query("ROLLBACK");
+        throw err;
+    } finally {
+        client.release();
     }
-    res.sendStatus(204);
-  } catch (err) {
-    console.error("Error deleting order:", err);
-    res.sendStatus(500);
-  }
 });
 
 ordersRouter.get("/:accountId/:orderId", async (req, res) => {
